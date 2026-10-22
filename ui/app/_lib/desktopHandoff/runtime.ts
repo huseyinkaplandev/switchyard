@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { packageDirectory, readHandoffPackage } from './packages';
 import type { DesktopRuntime } from './types';
+import { isDemoMode } from '../paths';
 
 function alive(pid: unknown) {
   if(typeof pid!=='number'||!Number.isInteger(pid)||pid<1)return false;
@@ -22,10 +23,11 @@ export async function getDesktopRuntime(id:string):Promise<DesktopRuntime> {
 }
 export async function startDesktopAction(id:string,action:'start'|'open',itemId?:string) {
   const pkg=await readHandoffPackage(id),directory=packageDirectory(id);
-  if(process.platform!=='win32'||pkg.targetProvider!=='claude-code')throw new Error('Direct dispatch currently supports Windows Claude Desktop only');
+  const demo=isDemoMode();
+  if(!demo&&(process.platform!=='win32'||pkg.targetProvider!=='claude-code'))throw new Error('Direct dispatch currently supports Windows Claude Desktop only');
   if(itemId!==undefined&&(typeof itemId!=='string'||!pkg.items.some(i=>i.id===itemId))||action==='open'&&!itemId)throw new Error('Invalid package item');
   const selected=itemId?pkg.items.filter(i=>i.id===itemId):pkg.items;
-  if(action==='start'&&selected.some(i=>i.source.platform!=='windows'))throw new Error('Source OS differs; project mapping required');
+  if(!demo&&action==='start'&&selected.some(i=>i.source.platform!=='windows'))throw new Error('Source OS differs; project mapping required');
   const launchFile=path.join(directory,'launch.lock');
   let launch;
   try{launch=await fs.open(launchFile,'wx');}catch{
@@ -41,7 +43,8 @@ export async function startDesktopAction(id:string,action:'start'|'open',itemId?
     const manifest=await fs.readFile(path.join(directory,'manifest.json'));
     const hash=(await fs.readFile(path.join(directory,'manifest.sha256'),'utf8')).trim();
     if(crypto.createHash('sha256').update(manifest).digest('hex')!==hash)throw new Error('Manifest hash mismatch');
-    const script=path.resolve(process.cwd(),'scripts','desktop-handoff','dashboard-runner.mjs');await fs.access(script);
+    // Demo mode replays the delivery states with a simulator instead of driving Claude Desktop.
+    const script=path.resolve(process.cwd(),'scripts','desktop-handoff',demo?'demo-runner.mjs':'dashboard-runner.mjs');await fs.access(script);
     await fs.rm(path.join(directory,'stop'),{force:true});
     await fs.writeFile(path.join(directory,'runtime.json'),JSON.stringify({status:'launching',pid:process.pid,action,itemId:itemId??null,error:null,updatedAt:new Date().toISOString()}));
     const log=await fs.open(path.join(directory,'controller.log'),'a');

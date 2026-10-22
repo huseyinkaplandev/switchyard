@@ -18,6 +18,8 @@
     "start": "npm run start -w @switchyard/ui",
     "typecheck": "npm run typecheck -w @switchyard/ui && npm run typecheck -w @switchyard/cli",
     "test": "npm test -w @switchyard/ui",
+    "demo": "node scripts/demo.mjs",
+    "demo:live": "node scripts/demo-live.mjs",
     "sync:agents": "npm run sync -w @switchyard/cli"
   }
 }

@@ -15,12 +15,14 @@
 // they are rendered from task-prompts/ with {{ROOT}} replaced by the schedules folder's real path, so the same
 // manifest works on another machine.
 //
-// The schedules folder is <data dir>/schedules (SWITCHYARD_SCHEDULES_DIR overrides it).
+// The schedules folder is <data dir>/schedules (SWITCHYARD_SCHEDULES_DIR overrides it). In demo mode
+// (SWITCHYARD_DEMO=1) the script never reports a running Claude and refuses to quit or start the app.
 import { execFileSync, spawn } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+const demo = process.env.SWITCHYARD_DEMO === '1';
 const root = path.resolve(process.env.SWITCHYARD_SCHEDULES_DIR
   || path.join(process.env.SWITCHYARD_DATA_DIR || path.join(os.homedir(), '.switchyard'), 'schedules'));
 const manifestFile = path.join(root, 'state', 'claude-task-manifest.json');
@@ -88,6 +90,7 @@ function liveAccount(all = accounts()) {
 }
 
 function claudeRunning() {
+  if (demo) return false;
   try {
     if (isMac) return execFileSync('pgrep', ['-x', 'Claude'], { encoding: 'utf8' }).trim().length > 0;
     return /claude\.exe/i.test(execFileSync('tasklist', ['/FI', 'IMAGENAME eq claude.exe', '/NH'], { encoding: 'utf8' }));
@@ -175,6 +178,7 @@ function mergeInto(entry, manifest) {
 }
 
 function quitClaude() {
+  if (demo) throw new Error('Demo mode: Claude Desktop is never closed.');
   if (!claudeRunning()) return;
   try {
     if (isMac) execFileSync('osascript', ['-e', 'quit app "Claude"']);
@@ -188,6 +192,7 @@ function quitClaude() {
 }
 
 async function startClaude() {
+  if (demo) throw new Error('Demo mode: Claude Desktop is never started.');
   const launcher = isMac ? 'open' : path.join(process.env.LOCALAPPDATA || '', 'AnthropicClaude', 'claude.exe');
   if (!isMac && !existsSync(launcher)) throw new Error('Claude launcher not found: ' + launcher);
   await new Promise((resolve, reject) => {

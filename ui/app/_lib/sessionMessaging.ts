@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import readline from 'node:readline';
 import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
-import { appDataDir, codexHome, getDataDir, homeDir, localAppDataDir, opencodeDataDir } from './paths';
+import { appDataDir, codexHome, getDataDir, homeDir, isDemoMode, localAppDataDir, opencodeDataDir } from './paths';
 import { getAgentThread } from './agentArchive';
 import { locateLocalSession } from './sessions';
 import { codexWriterBusy, messageErrorCode } from '../../scripts/session-writer-probe.mjs';
@@ -134,6 +134,8 @@ export async function resolveMessageTarget(kind: string, id: string, checkBusy =
       } finally { await handle.close(); }
     }
   }
+  // Demo mode never resumes a real CLI: a stand-in agent prints one simulated reply.
+  if (isDemoMode()) return { provider, nativeId, cwd: homeDir(), command: process.execPath, prefix: [path.resolve(process.cwd(), 'scripts', 'demo-agent.mjs')], targetKey: crypto.createHash('sha256').update(`${provider}:${nativeId}`).digest('hex') };
   try { if (!(await fs.stat(cwd)).isDirectory()) throw new Error(); } catch { throw new MessageError('workspace_missing'); }
   return { provider, nativeId, cwd, ...await executable(provider), targetKey: crypto.createHash('sha256').update(`${provider}:${nativeId}`).digest('hex') };
 }

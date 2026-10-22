@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFile } from 'node:child_process';
-import { appDataDir, claudeDesktopDir, codexHome, getDataDir, homeDir, localAppDataDir, secondaryMacHome } from './paths';
+import { appDataDir, claudeDesktopDir, codexHome, getDataDir, homeDir, isDemoMode, localAppDataDir, secondaryMacHome } from './paths';
 import { archiveActivityMessages } from './agentArchiveDb';
 import { summarizeActivity } from './desktopHandoff/activity';
 
@@ -42,6 +42,10 @@ type ClaudeTask = {
 type ClaudeScheduleFile = { scheduledTasks: ClaudeTask[]; [key: string]: unknown };
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export class DemoModeError extends Error {
+  constructor(action: string) { super(`Demo mode: ${action} is disabled. Nothing on this machine was changed.`); }
+}
 
 async function readJson<T>(file: string): Promise<T | null> {
   try { return JSON.parse(await fs.readFile(file, 'utf8')) as T; }
@@ -238,7 +242,7 @@ export async function getActiveClaudeAccount(): Promise<string | null> {
 function taskRoot(): string { return path.join(getDataDir(), 'schedules'); }
 function repositoryScript(name: string): string { return path.resolve(process.cwd(), '..', 'scripts', name); }
 
-/** Child scripts see the same home and data folder as the server. */
+/** Child scripts see the same home, data folder and demo flag as the server. */
 function scriptEnvironment(): NodeJS.ProcessEnv {
   const home = homeDir();
   return { ...process.env, HOME: home, USERPROFILE: home, APPDATA: appDataDir(), LOCALAPPDATA: localAppDataDir(),
@@ -269,6 +273,7 @@ export async function claudeSyncStatus(): Promise<ClaudeSyncStatus | null> {
 
 // One click: quit Claude Desktop, write the manifest into every account including the live one, start Claude.
 export async function installClaudeTasks(): Promise<unknown> {
+  if (isDemoMode()) throw new DemoModeError('restarting Claude Desktop to install tasks');
   if (syncing) throw new Error('Task sync is already running; try again in a few seconds.');
   syncing = true;
   try {
@@ -286,6 +291,7 @@ let savingSkills = false;
 // One click: copy the newest copy of every skill into the bundle folder, ~/.claude/skills and every
 // Claude Desktop account's skill cache. Nothing is committed or pushed anywhere.
 export async function saveAllSkills(): Promise<SkillSaveResult> {
+  if (isDemoMode()) throw new DemoModeError('skill sync');
   if (savingSkills) throw new Error('Skill sync is already running.');
   savingSkills = true;
   try {

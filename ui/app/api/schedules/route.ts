@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { copyClaudeTasksToCodex, claudeSyncStatus, getActiveClaudeAccount, installClaudeTasks, listScheduledTasks, saveAllSkills, monitorClaudeAccountChanges, setScheduledTaskEnabled } from '@/app/_lib/schedules';
+import { copyClaudeTasksToCodex, claudeSyncStatus, DemoModeError, getActiveClaudeAccount, installClaudeTasks, listScheduledTasks, saveAllSkills, monitorClaudeAccountChanges, setScheduledTaskEnabled } from '@/app/_lib/schedules';
+import { isDemoMode } from '@/app/_lib/paths';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,7 +9,7 @@ export async function GET() {
   try {
     const autoMigration = await monitorClaudeAccountChanges();
     const [tasks, activeClaudeAccount, claudeSync] = await Promise.all([listScheduledTasks(), getActiveClaudeAccount(), claudeSyncStatus()]);
-    return NextResponse.json({ tasks, activeClaudeAccount, autoMigration, claudeSync, platform: process.platform === 'darwin' ? 'macos' : 'windows' });
+    return NextResponse.json({ tasks, activeClaudeAccount, autoMigration, claudeSync, demo: isDemoMode(), platform: process.platform === 'darwin' ? 'macos' : 'windows' });
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(await installClaudeTasks());
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Migration failed' }, { status: 400 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Migration failed', demo: error instanceof DemoModeError }, { status: 400 });
   }
 }
 

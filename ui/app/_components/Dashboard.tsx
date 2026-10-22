@@ -41,9 +41,10 @@ interface DashboardProps {
   };
   initialTasks: Task[];
   initialCodexThreads: AgentArchiveThread[];
+  demo: boolean;
 }
 
-function DashboardContent({ initial, initialTasks, initialCodexThreads }: DashboardProps) {
+function DashboardContent({ initial, initialTasks, initialCodexThreads, demo }: DashboardProps) {
   const searchParams = useSearchParams();
   const activeTab = searchParams.get('tab') || 'codex';
 
@@ -148,7 +149,7 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
   return (
     <div className="workspace-shell">
       <a href="#workspace-main" className="workspace-skip">{locale === 'tr' ? 'İçeriğe geç' : 'Skip to content'}</a>
-      <Tabs locale={locale} />
+      <Tabs locale={locale} demo={demo} />
       <div className="workspace-center">
       {/* Roles Mapping Configuration Error Alert Banner */}
       {rolesWarning && (
@@ -279,7 +280,7 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
   );
 }
 
-export default function Dashboard({ initial, initialTasks, initialCodexThreads }: DashboardProps) {
+export default function Dashboard({ initial, initialTasks, initialCodexThreads, demo }: DashboardProps) {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-zinc-950 text-zinc-400 flex items-center justify-center font-mono text-xs select-none">
@@ -290,6 +291,7 @@ export default function Dashboard({ initial, initialTasks, initialCodexThreads }
         initial={initial}
         initialTasks={initialTasks}
         initialCodexThreads={initialCodexThreads}
+        demo={demo}
       />
     </Suspense>
   );

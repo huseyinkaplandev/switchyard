@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { isDemoMode } from '../../../_lib/paths';
 import { sameLocalOrigin } from '../../../_lib/desktopHandoff/origin';
 
 const execFileAsync = promisify(execFile);
@@ -11,6 +12,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null) as { provider?: keyof typeof APP_NAMES } | null;
   const provider = body?.provider;
   if (!provider || !Object.hasOwn(APP_NAMES, provider)) return NextResponse.json({ error: 'Invalid provider.' }, { status: 400 });
+  if (isDemoMode()) return NextResponse.json({ error: `Demo mode: ${APP_NAMES[provider]} was not opened.`, demo: true }, { status: 409 });
   try {
     if (process.platform === 'win32') {
       // Resolve the installed app identity, including Store-packaged Codex.

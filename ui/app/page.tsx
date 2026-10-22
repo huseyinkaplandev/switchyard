@@ -1,5 +1,6 @@
 import { getState, listCodexThreads, listTasks } from './_actions';
 import Dashboard from './_components/Dashboard';
+import { isDemoMode } from './_lib/paths';
 
 // Force dynamic rendering and prevent caching
 export const dynamic = 'force-dynamic';
@@ -33,6 +34,7 @@ export default async function Page({
       initial={initialNormalized}
       initialTasks={initialTasks}
       initialCodexThreads={initialCodexThreads}
+      demo={isDemoMode()}
     />
   );
 }

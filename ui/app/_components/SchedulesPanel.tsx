@@ -6,7 +6,7 @@ import { DataTable } from './assistant-ui/elements/data-table';
 import AgentIcon from './AgentIcon';
 import { TRANSLATIONS, type Locale } from '../_lib/translations';
 
-type ScheduleResponse = { tasks: ScheduledTask[]; activeClaudeAccount: string | null; platform?: 'windows' | 'macos'; claudeSync?: ClaudeSyncStatus | null; autoMigration?: {
+type ScheduleResponse = { tasks: ScheduledTask[]; activeClaudeAccount: string | null; demo?: boolean; platform?: 'windows' | 'macos'; claudeSync?: ClaudeSyncStatus | null; autoMigration?: {
   lastAccount: string; lastApply?: { at: string }; needsInstall?: boolean; error?: string;
 } | null };
 
@@ -132,6 +132,7 @@ export default function SchedulesPanel({ locale }: { locale: Locale }) {
         {tr ? 'Yenile' : 'Refresh'}
       </button>
     </div>
+    {data.demo && <p className="text-xs text-cyan-300">{tr ? 'Demo modu: görevler örnek verilerden okunur; Claude Desktop yeniden başlatılmaz.' : 'Demo mode: tasks come from bundled sample data; Claude Desktop is never restarted.'}</p>}
 
     <div className="flex flex-wrap gap-2">
       {(['windows', 'macos'] as const).map(os => <button key={os} aria-pressed={platform === os} onClick={() => { setPlatform(os); setAccountFilter(os===localPlatform?'current':'all'); }}

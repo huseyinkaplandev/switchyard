@@ -1,4 +1,6 @@
 import 'server-only';
+import { isDemoMode } from './paths';
+import { demoAiReply } from './demoAi';
 
 const OLLAMA_BASE = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
 const DEFAULT_MODEL = process.env.OLLAMA_MODEL || 'qwen2.5:3b';
@@ -22,6 +24,7 @@ export interface AiGenerateResult {
 
 export async function aiGenerate(opts: AiGenerateOpts): Promise<AiGenerateResult> {
   const { model = DEFAULT_MODEL as AiModel, system, prompt, temperature = 0.3, maxTokens = 512, format } = opts;
+  if (isDemoMode()) return { text: demoAiReply(system, prompt), model: 'demo', done: true };
 
   const body: Record<string, unknown> = {
     model,
@@ -69,6 +72,11 @@ export async function aiStreamGenerate(
   onToken: (token: string) => void,
 ): Promise<string> {
   const { model = DEFAULT_MODEL as AiModel, system, prompt, temperature = 0.3, maxTokens = 512 } = opts;
+  if (isDemoMode()) {
+    const reply = demoAiReply(system, prompt);
+    for (const word of reply.split(/(?<=\s)/)) { onToken(word); await new Promise((resolve) => setTimeout(resolve, 15)); }
+    return reply;
+  }
 
   const body: Record<string, unknown> = {
     model,
