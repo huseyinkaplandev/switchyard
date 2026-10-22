@@ -19,6 +19,9 @@ import AgentsMdEditor from './AgentsMdEditor';
 import CopyAgentsMd from './CopyAgentsMd';
 import SnapshotButton from './SnapshotButton';
 import PromptTab from './PromptTab';
+import AIInsightPanel from './AIInsightPanel';
+import DailyReport from './DailyReport';
+import AIChatWidget from './AIChatWidget';
 import SchedulesPanel from './SchedulesPanel';
 import SessionsPanel from './SessionsPanel';
 import CodexSessions from './CodexSessions';
@@ -139,6 +142,7 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
   const subtitle = ({
     codex: t.workspaceChats, sessions: t.workspaceChats, schedules: t.workspaceSchedules,
     tasks: t.workspaceTasks, live: t.workspaceActivity, prompts: t.promptChat,
+    insights: t.aiInsights, report: t.dailyReport,
   } as Record<string, string>)[activeTab] || t.workspaceChats;
 
   return (
@@ -165,6 +169,7 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
           </p>
         </div>
         <div className="flex items-center gap-2.5 sm:gap-3.5 justify-between sm:justify-end">
+          <AIChatWidget locale={locale} />
           {/* EN / TR language switch */}
           <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-850 p-0.5 rounded-lg select-none">
             <button
@@ -213,6 +218,18 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
         {activeTab === 'codex' && (
           <section aria-label="Codex projects and sessions" className="flex flex-col gap-5">
             <CodexSessions initialThreads={initialCodexThreads} locale={locale} />
+          </section>
+        )}
+
+        {activeTab === 'insights' && (
+          <section aria-label="AI Insights Panel">
+            <AIInsightPanel locale={locale} />
+          </section>
+        )}
+
+        {activeTab === 'report' && (
+          <section aria-label="Daily Report">
+            <DailyReport locale={locale} />
           </section>
         )}
 

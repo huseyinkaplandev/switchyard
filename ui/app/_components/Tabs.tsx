@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { MessageSquareText, CalendarClock, ListTodo, Activity, FileText } from 'lucide-react';
+import { MessageSquareText, CalendarClock, ListTodo, Activity, FileText, ChartNoAxesCombined, BookOpen } from 'lucide-react';
 import { Locale, TRANSLATIONS } from '../_lib/translations';
 
 export default function Tabs({ locale }: { locale: Locale }) {
@@ -18,7 +18,9 @@ export default function Tabs({ locale }: { locale: Locale }) {
     { id: 'live', label: t.workspaceActivity, icon: Activity, active: tab === 'live' },
     { id: 'prompts', label: t.promptChat, icon: FileText, active: tab === 'prompts' },
   ];
-  const secondary: typeof primary = [
+  const secondary = [
+    { id: 'insights', label: t.aiInsights, icon: ChartNoAxesCombined, active: tab === 'insights' },
+    { id: 'report', label: t.dailyReport, icon: BookOpen, active: tab === 'report' },
   ];
   return <aside className="workspace-sidebar">
     <Link href="/?tab=codex" className="workspace-brand">Switchyard<span>{t.workspaceLocal}</span></Link>
