@@ -1,0 +1,23 @@
+{
+  "name": "@switchyard/cli",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Huseyin Kaplan",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "bin": {
+    "log-agent": "./dist/bin/log-agent.js",
+    "switchyard-sync": "./dist/bin/sync-agent.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "sync": "tsc && node dist/bin/sync-agent.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "5.9.3"
+  }
+}

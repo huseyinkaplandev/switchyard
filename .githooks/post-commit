@@ -1,0 +1,35 @@
+#!/bin/bash
+# Optional hook: logs every commit to the Switchyard activity log through the log-agent CLI.
+# Enable it in a project with: git config core.hooksPath <path-to-switchyard>/.githooks
+set -e
+
+COMMIT_HASH=$(git log -1 --format="%h" HEAD)
+COMMIT_SUBJECT=$(git log -1 --format="%s" HEAD | tr '\n' ' ')
+COMMIT_AUTHOR=$(git log -1 --format="%an" HEAD)
+
+# Detect the agent from a commit message prefix such as "opencode: fix thing".
+FIRST_WORD=$(echo "$COMMIT_SUBJECT" | sed 's/:.*//' | tr '[:upper:]' '[:lower:]')
+
+case "$FIRST_WORD" in
+  codex|claude-code|cursor|vscode|vscode-insiders|opencode|antigravity|kiro)
+    AGENT_SLUG="$FIRST_WORD"
+    ;;
+  *)
+    case "$COMMIT_AUTHOR" in
+      *Codex*) AGENT_SLUG="codex" ;;
+      *Claude*) AGENT_SLUG="claude-code" ;;
+      *Cursor*) AGENT_SLUG="cursor" ;;
+      *"VS Code"*) AGENT_SLUG="vscode" ;;
+      *Insiders*) AGENT_SLUG="vscode-insiders" ;;
+      *OpenCode*) AGENT_SLUG="opencode" ;;
+      *Antigravity*) AGENT_SLUG="antigravity" ;;
+      *Kiro*) AGENT_SLUG="kiro" ;;
+      *) exit 0 ;;
+    esac
+    ;;
+esac
+
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_AGENT="$HOOK_DIR/../cli/dist/bin/log-agent.js"
+[ -f "$LOG_AGENT" ] || exit 0
+node "$LOG_AGENT" "$AGENT_SLUG" "git" "COMMIT ${COMMIT_HASH}: ${COMMIT_SUBJECT}" 2>&1 || true

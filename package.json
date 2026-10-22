@@ -6,16 +6,17 @@
   "license": "MIT",
   "author": "Huseyin Kaplan",
   "workspaces": [
-    "ui"
+    "ui",
+    "cli"
   ],
   "engines": {
     "node": ">=22.13"
   },
   "scripts": {
     "dev": "npm run dev -w @switchyard/ui",
-    "build": "npm run build -w @switchyard/ui",
+    "build": "npm run build -w @switchyard/ui && npm run build -w @switchyard/cli",
     "start": "npm run start -w @switchyard/ui",
-    "typecheck": "npm run typecheck -w @switchyard/ui",
+    "typecheck": "npm run typecheck -w @switchyard/ui && npm run typecheck -w @switchyard/cli",
     "test": "npm test -w @switchyard/ui"
   }
 }
