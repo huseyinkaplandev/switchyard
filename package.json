@@ -17,6 +17,7 @@
     "build": "npm run build -w @switchyard/ui && npm run build -w @switchyard/cli",
     "start": "npm run start -w @switchyard/ui",
     "typecheck": "npm run typecheck -w @switchyard/ui && npm run typecheck -w @switchyard/cli",
-    "test": "npm test -w @switchyard/ui"
+    "test": "npm test -w @switchyard/ui",
+    "sync:agents": "npm run sync -w @switchyard/cli"
   }
 }
