@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.next-build/
+dist/
+.demo/
+*.log
+*.tsbuildinfo
+.env
+.env.*
+.DS_Store
+Thumbs.db
+ui/public/uploads/

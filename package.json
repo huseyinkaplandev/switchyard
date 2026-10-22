@@ -1,0 +1,21 @@
+{
+  "name": "switchyard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "One local yard for every AI coding session: search the archive, watch agents live, track schedules, and hand a chat to another account or tool when the limit hits.",
+  "license": "MIT",
+  "author": "Huseyin Kaplan",
+  "workspaces": [
+    "ui"
+  ],
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "npm run dev -w @switchyard/ui",
+    "build": "npm run build -w @switchyard/ui",
+    "start": "npm run start -w @switchyard/ui",
+    "typecheck": "npm run typecheck -w @switchyard/ui",
+    "test": "npm test -w @switchyard/ui"
+  }
+}

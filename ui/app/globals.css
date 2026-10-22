@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+@import "./assistant-dashboard.css";
+
+@layer base {
+  body {
+    background-color: #09090b; /* zinc-950 */
+    color: #f4f4f5; /* zinc-100 */
+    font-family: var(--font-inter), sans-serif;
+  }
+}
+
+/* Lock body scroll when any modal dialog is open */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
+/* Line clamp custom style if needed (or utility class in v4) */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pulse keyframes for status dot */
+@keyframes status-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
+.pulse-dot {
+  animation: status-pulse 2s infinite ease-in-out;
+}
