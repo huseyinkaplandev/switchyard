@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { MessageSquareText } from 'lucide-react';
+import { MessageSquareText, ListTodo, Activity, FileText } from 'lucide-react';
 import { Locale, TRANSLATIONS } from '../_lib/translations';
 
 export default function Tabs({ locale }: { locale: Locale }) {
@@ -13,6 +13,9 @@ export default function Tabs({ locale }: { locale: Locale }) {
   useEffect(() => { setHost(window.location.host); }, []);
   const primary = [
     { id: 'codex', label: t.workspaceChats, icon: MessageSquareText, active: ['codex', 'sessions'].includes(tab) },
+    { id: 'tasks', label: t.workspaceTasks, icon: ListTodo, active: tab === 'tasks' },
+    { id: 'live', label: t.workspaceActivity, icon: Activity, active: tab === 'live' },
+    { id: 'prompts', label: t.promptChat, icon: FileText, active: tab === 'prompts' },
   ];
   const secondary: typeof primary = [
   ];

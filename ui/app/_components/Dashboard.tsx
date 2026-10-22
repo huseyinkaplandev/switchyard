@@ -10,8 +10,15 @@ import { Mention } from '../_lib/parseMentions';
 import { getState, listTasks } from '../_actions';
 import { Locale, TRANSLATIONS } from '../_lib/translations';
 import { RolesMap } from '../_lib/roles';
+import AgentGrid from './AgentGrid';
+import LogStream from './LogStream';
 import Tabs from './Tabs';
 import ConversationViews from './ConversationViews';
+import KanbanBoard from './KanbanBoard';
+import AgentsMdEditor from './AgentsMdEditor';
+import CopyAgentsMd from './CopyAgentsMd';
+import SnapshotButton from './SnapshotButton';
+import PromptTab from './PromptTab';
 import SessionsPanel from './SessionsPanel';
 import CodexSessions from './CodexSessions';
 import type { AgentArchiveThread } from '../_lib/agentArchiveDb';
@@ -130,6 +137,7 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
 
   const subtitle = ({
     codex: t.workspaceChats, sessions: t.workspaceChats,
+    tasks: t.workspaceTasks, live: t.workspaceActivity, prompts: t.promptChat,
   } as Record<string, string>)[activeTab] || t.workspaceChats;
 
   return (
@@ -175,6 +183,10 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
               TR
             </button>
           </div>
+
+          {activeTab !== 'tasks' && (
+            <AgentsMdEditor locale={locale} />
+          )}
         </div>
       </header>
 
@@ -184,10 +196,62 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
       <main id="workspace-main" className="workspace-main">
         {['codex', 'sessions'].includes(activeTab) && <ConversationViews locale={locale} archive={activeTab === 'sessions'} />}
         {activeTab === 'sessions' && <SessionsPanel locale={locale} />}
+        {activeTab === 'tasks' && (
+          <section aria-label="Tasks Kanban Board">
+            <KanbanBoard tasks={tasks} onRefresh={triggerPoll} locale={locale} />
+          </section>
+        )}
+
+        {activeTab === 'prompts' && (
+          <section aria-label="Prompt Editor">
+            <PromptTab locale={locale} onRefresh={triggerPoll} />
+          </section>
+        )}
+
         {activeTab === 'codex' && (
           <section aria-label="Codex projects and sessions" className="flex flex-col gap-5">
             <CodexSessions initialThreads={initialCodexThreads} locale={locale} />
           </section>
+        )}
+
+        {activeTab === 'live' && (
+          <>
+            {/* Main Grid of Agents */}
+            <section aria-label="AI Agents Status Grid">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-wider font-semibold select-none">
+                  {locale === 'tr' ? 'Agent Durumu' : 'Agent Status'}
+                </span>
+                <CopyAgentsMd agentsMd={agentsMd} locale={locale} />
+              </div>
+              <AgentGrid
+                entries={entries}
+                lead={lead}
+                mentions={mentions}
+                last10LogLines={last10LogLines}
+                agentsMd={agentsMd}
+                locale={locale}
+                onSelectLead={(id) => setLead(id as AgentId)}
+              />
+            </section>
+
+            {/* Live Logs Console */}
+            <section aria-label="Terminal Stream Log" className="mt-2">
+              <div className="flex items-center justify-between mb-2">
+                <span />
+                <SnapshotButton
+                  lead={lead}
+                  roles={roles}
+                  tasks={tasks}
+                  pendingMentions={mentions.pending}
+                  entries={entries}
+                  locale={locale}
+                  compact
+                />
+              </div>
+              <LogStream entries={entries} locale={locale} />
+            </section>
+          </>
         )}
       </main>
 
