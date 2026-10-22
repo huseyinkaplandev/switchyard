@@ -19,6 +19,7 @@ import AgentsMdEditor from './AgentsMdEditor';
 import CopyAgentsMd from './CopyAgentsMd';
 import SnapshotButton from './SnapshotButton';
 import PromptTab from './PromptTab';
+import SchedulesPanel from './SchedulesPanel';
 import SessionsPanel from './SessionsPanel';
 import CodexSessions from './CodexSessions';
 import type { AgentArchiveThread } from '../_lib/agentArchiveDb';
@@ -136,7 +137,7 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
     .join('\n');
 
   const subtitle = ({
-    codex: t.workspaceChats, sessions: t.workspaceChats,
+    codex: t.workspaceChats, sessions: t.workspaceChats, schedules: t.workspaceSchedules,
     tasks: t.workspaceTasks, live: t.workspaceActivity, prompts: t.promptChat,
   } as Record<string, string>)[activeTab] || t.workspaceChats;
 
@@ -195,6 +196,7 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads }: Dashbo
       {/* Main Tab Render Container */}
       <main id="workspace-main" className="workspace-main">
         {['codex', 'sessions'].includes(activeTab) && <ConversationViews locale={locale} archive={activeTab === 'sessions'} />}
+        {activeTab === 'schedules' && <SchedulesPanel locale={locale} />}
         {activeTab === 'sessions' && <SessionsPanel locale={locale} />}
         {activeTab === 'tasks' && (
           <section aria-label="Tasks Kanban Board">
