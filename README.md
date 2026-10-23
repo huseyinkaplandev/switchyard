@@ -224,3 +224,5 @@ The tests cover the native parsers (Codex rollouts, Claude Code queue records, A
 ## License
 
 [MIT](LICENSE). Third-party notices are in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
+
+Product names and logos are trademarks of their owners, used only to identify the tools Switchyard reads; no endorsement implied.

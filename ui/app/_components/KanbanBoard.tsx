@@ -343,14 +343,9 @@ export default function KanbanBoard({ tasks, onRefresh, locale }: KanbanBoardPro
                   {colAgents.length > 0 && (
                     <div className="flex items-center -space-x-1">
                       {colAgents.slice(0, 4).map((a) => (
-                        <div
-                          key={a.id}
-                          style={{ backgroundColor: a.color }}
-                          className="w-4 h-4 rounded-full text-[6px] font-bold font-mono text-white flex items-center justify-center ring-1 ring-zinc-950"
-                          title={a.name}
-                        >
-                          {a.initial}
-                        </div>
+                        <span key={a.id} title={a.name} className="flex rounded ring-1 ring-zinc-950">
+                          <AgentIcon agent={a.id} size={16} />
+                        </span>
                       ))}
                       {colAgents.length > 4 && (
                         <span className="text-xs font-mono text-zinc-500 ml-1">

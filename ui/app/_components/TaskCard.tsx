@@ -7,6 +7,7 @@ import { AGENTS } from '../_lib/agents';
 import { updateTaskAssignee, updateTaskStatus, buildPrompt, deleteTask } from '../_actions';
 import { Locale, TRANSLATIONS } from '../_lib/translations';
 import InitialPromptModal from './InitialPromptModal';
+import AgentIcon from './AgentIcon';
 import ConfirmDialog from './ConfirmDialog';
 
 interface TaskCardProps {
@@ -26,8 +27,6 @@ export default function TaskCard({ task, onRefresh, locale, selected = false, on
   const t = TRANSLATIONS[locale];
 
   const assigneeMeta = AGENTS.find((a) => a.id === task.assignee);
-  const assigneeColor = assigneeMeta?.color || '#3f3f46';
-  const assigneeInitial = assigneeMeta?.initial || '--';
 
   const priorityColor = {
     high: 'bg-red-500 shadow-[0_0_8px_#ef4444]',
@@ -162,12 +161,14 @@ export default function TaskCard({ task, onRefresh, locale, selected = false, on
               {selected ? <CheckSquare size={13} /> : <Square size={13} />}
             </button>
           )}
-          <div
-            style={{ backgroundColor: assigneeColor }}
-            className="w-5 h-5 rounded text-xs font-bold font-mono text-white flex items-center justify-center select-none"
-          >
-            {assigneeInitial}
-          </div>
+          {assigneeMeta ? <AgentIcon agent={assigneeMeta.id} size={20} /> : (
+            <div
+              style={{ backgroundColor: '#3f3f46' }}
+              className="w-5 h-5 rounded text-xs font-bold font-mono text-white flex items-center justify-center select-none"
+            >
+              --
+            </div>
+          )}
           <span className="font-mono text-xs font-semibold text-zinc-500 select-none">
             {task.id}
           </span>

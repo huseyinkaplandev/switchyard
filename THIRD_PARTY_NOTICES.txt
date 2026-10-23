@@ -117,5 +117,18 @@ or optional packages pulled in by Next.js and Tailwind CSS:
 
 Codex, ChatGPT, Claude, Claude Code, OpenCode, Antigravity, Cursor, VS Code,
 GitHub Copilot and Kiro are trademarks of their respective owners. Switchyard
-is not affiliated with or endorsed by any of them. No vendor logos are bundled;
-the interface shows plain initials instead.
+is not affiliated with or endorsed by any of them.
+
+Product names and logos are trademarks of their owners, used only to identify the
+tools Switchyard reads; no endorsement implied. The logos in ui/public/agents/ are
+unmodified files from these sources:
+
+  codex.png             OpenAI, icon of the "Codex" VS Code extension
+                        (marketplace.visualstudio.com/items?itemName=openai.chatgpt)
+  claude-code.svg       Anthropic press kit, Claude spark in clay
+                        (www.anthropic.com/press-kit)
+  opencode.svg          OpenCode brand assets, logo for dark themes (opencode.ai/brand)
+  antigravity.svg       Google Antigravity press kit, full-colour icon
+                        (antigravity.google/press)
+  cursor.png, kiro.png, vscode.png, vscode-insiders.png
+                        the products' application icons

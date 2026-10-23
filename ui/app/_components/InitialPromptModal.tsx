@@ -9,6 +9,7 @@ import { AGENTS } from '../_lib/agents';
 import { Locale } from '../_lib/translations';
 import type { Task } from '../_lib/parseTask';
 import DraftSidebar, { DraftItem } from './DraftSidebar';
+import AgentIcon from './AgentIcon';
 import AIEnhanceModal from './AIEnhanceModal';
 import type { EnhanceTaskResult } from '../api/ai/enhance-task/route';
 
@@ -623,12 +624,14 @@ export default function InitialPromptModal({ onRefresh, locale, editingTask }: I
               </div>
               <span className="text-zinc-800 select-none">|</span>
               <div className="flex items-center gap-2">
-                <div
-                  className="w-5 h-5 rounded text-[8px] font-bold font-mono text-white flex items-center justify-center select-none shrink-0"
-                  style={{ backgroundColor: selectedAgent?.color || '#3f3f46' }}
-                >
-                  {selectedAgent?.initial || '--'}
-                </div>
+                {selectedAgent ? <AgentIcon agent={selectedAgent.id} size={20} /> : (
+                  <div
+                    className="w-5 h-5 rounded text-[8px] font-bold font-mono text-white flex items-center justify-center select-none shrink-0"
+                    style={{ backgroundColor: '#3f3f46' }}
+                  >
+                    --
+                  </div>
+                )}
                 <select
                   value={assignee}
                   onChange={(e) => setAssignee(e.target.value)}
