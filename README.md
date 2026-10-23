@@ -57,7 +57,7 @@ Requirements: Node.js 22.13 or later (24 LTS recommended; Switchyard uses the bu
 ### 1. Demo mode (start here)
 
 ```bash
-git clone <this repository> switchyard
+git clone https://github.com/huseyinkaplandev/switchyard.git
 cd switchyard
 npm ci
 npm run demo
