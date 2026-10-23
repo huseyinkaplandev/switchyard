@@ -11,7 +11,7 @@ import type { DesktopRuntime, HandoffCandidate, HandoffPackage, ItemProgress, Ti
 
 type Catalog = { candidates: HandoffCandidate[]; warnings: string[]; accountLabels?: Record<string,string> };
 type Detail = { package: HandoffPackage; bootstrapText: string; progress: ItemProgress[]; runtime?: DesktopRuntime; directSupported?: boolean };
-export default function DesktopHandoffPanel({ locale, onClose }: { locale: Locale; onClose: () => void }) {
+export default function DesktopHandoffPanel({ locale, onClose, initialPackageId }: { locale: Locale; onClose: () => void; initialPackageId?: string }) {
   const t = TRANSLATIONS[locale].handoff;
   const [catalog,setCatalog] = useState<Catalog>({ candidates: [], warnings: [] });
   const [allRuns,setAllRuns] = useState(false);
@@ -72,6 +72,8 @@ export default function DesktopHandoffPanel({ locale, onClose }: { locale: Local
     try{const r=await fetch(`/api/handoff/packages/${id}`);if(!r.ok)throw new Error(t.sourceMissing);setDetail(await r.json());setStage('deliver');}
     catch(error){setError(String(error));}finally{setBusy(false);}
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- opens a saved package once on mount.
+  useEffect(()=>{if(initialPackageId)void openPackage(initialPackageId);},[initialPackageId]);
   const completed=detail?.progress.filter(p=>p.state==='reply-observed'&&p.titleVerified).length??0;
   return <section className="desktop-handoff-panel" aria-label={t.title}>
     <header className="handoff-heading">

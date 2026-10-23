@@ -10,14 +10,11 @@ import { Mention } from '../_lib/parseMentions';
 import { getState, listTasks } from '../_actions';
 import { Locale, TRANSLATIONS } from '../_lib/translations';
 import { RolesMap } from '../_lib/roles';
-import AgentGrid from './AgentGrid';
-import LogStream from './LogStream';
 import Tabs from './Tabs';
 import ConversationViews from './ConversationViews';
 import KanbanBoard from './KanbanBoard';
 import AgentsMdEditor from './AgentsMdEditor';
-import CopyAgentsMd from './CopyAgentsMd';
-import SnapshotButton from './SnapshotButton';
+import LiveActivity from './LiveActivity';
 import PromptTab from './PromptTab';
 import AIInsightPanel from './AIInsightPanel';
 import DailyReport from './DailyReport';
@@ -134,12 +131,6 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads, demo }: 
     return () => clearInterval(interval);
   }, []);
 
-  // Compute situational context logs (last 10 raw entries) for mention prompts builder
-  const last10LogLines = entries
-    .slice(-10)
-    .map((e) => e.raw)
-    .join('\n');
-
   const subtitle = ({
     codex: t.workspaceChats, sessions: t.workspaceChats, schedules: t.workspaceSchedules,
     tasks: t.workspaceTasks, live: t.workspaceActivity, prompts: t.promptChat,
@@ -235,43 +226,16 @@ function DashboardContent({ initial, initialTasks, initialCodexThreads, demo }: 
         )}
 
         {activeTab === 'live' && (
-          <>
-            {/* Main Grid of Agents */}
-            <section aria-label="AI Agents Status Grid">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-wider font-semibold select-none">
-                  {locale === 'tr' ? 'Agent Durumu' : 'Agent Status'}
-                </span>
-                <CopyAgentsMd agentsMd={agentsMd} locale={locale} />
-              </div>
-              <AgentGrid
-                entries={entries}
-                lead={lead}
-                mentions={mentions}
-                last10LogLines={last10LogLines}
-                agentsMd={agentsMd}
-                locale={locale}
-                onSelectLead={(id) => setLead(id as AgentId)}
-              />
-            </section>
-
-            {/* Live Logs Console */}
-            <section aria-label="Terminal Stream Log" className="mt-2">
-              <div className="flex items-center justify-between mb-2">
-                <span />
-                <SnapshotButton
-                  lead={lead}
-                  roles={roles}
-                  tasks={tasks}
-                  pendingMentions={mentions.pending}
-                  entries={entries}
-                  locale={locale}
-                  compact
-                />
-              </div>
-              <LogStream entries={entries} locale={locale} />
-            </section>
-          </>
+          <LiveActivity
+            entries={entries}
+            lead={lead}
+            agentsMd={agentsMd}
+            roles={roles}
+            tasks={tasks}
+            mentions={mentions}
+            locale={locale}
+            onSelectLead={setLead}
+          />
         )}
       </main>
 
