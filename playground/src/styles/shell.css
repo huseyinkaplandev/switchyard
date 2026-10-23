@@ -1,0 +1,36 @@
+/* The playground root stands in for <body>: ui/app/layout.tsx puts data-assistant-ui on the body. */
+.sy-playground {
+  position: relative;
+  height: 100%;
+  min-height: 520px;
+  overflow: hidden;
+  isolation: isolate;
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.sy-frame { height: 100%; overflow: auto; overscroll-behavior: contain; }
+.workspace-shell { min-height: 100%; }
+.workspace-nav-item { width: 100%; border: 0; background: transparent; text-align: left; font: inherit; }
+.workspace-navigation [role=tablist] { display: flex; flex-direction: column; }
+
+/* The handoff panel normally fills a modal dialog; here it fills the frame below the header. */
+.sy-handoff {
+  height: calc(100vh - 150px);
+  min-height: 440px;
+  overflow: hidden;
+  background: var(--aui-bg);
+  border: 1px solid var(--aui-line);
+  border-radius: 18px;
+}
+
+@media (max-width: 767px) {
+  .workspace-navigation { scrollbar-width: none; }
+  .workspace-navigation::-webkit-scrollbar { display: none; }
+  .workspace-navigation [role=tablist] { flex-direction: row; gap: 4px; }
+  .workspace-nav-item { width: auto; flex-shrink: 0; }
+  .sy-handoff { height: calc(100vh - 170px); border-radius: 12px; }
+  /* A small frame cannot hold toolbar, list and transcript at once: let them stack and the frame scroll. */
+  .conversation-workspace { height: auto; min-height: 0; }
+  .conversation-workspace[data-mobile-detail] .conversation-reader[data-selected] { height: calc(100vh - 24px); min-height: 480px; }
+}

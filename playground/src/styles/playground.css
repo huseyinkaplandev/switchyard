@@ -1,0 +1,4 @@
+/* The real app stylesheet (Tailwind, KaTeX, workspace and assistant-ui CSS), then the playground frame.
+   scripts/scope-css.mjs confines all of it to .sy-playground at build time. */
+@import "../../../ui/app/globals.css";
+@import "./shell.css";

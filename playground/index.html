@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Switchyard playground test page</title>
+  <link rel="icon" href="data:,">
+  <!-- Static test page for the built bundle: run "npm run playground:build", then serve this folder. -->
+  <link rel="stylesheet" href="./dist/switchyard-playground.css">
+  <style>
+    /* Host page styles: they must stay as they are, and the playground must look the same inside them. */
+    body { margin: 0; padding: 24px 16px 48px; background: #f6f3ec; color: #222; font: 17px/1.6 Georgia, 'Times New Roman', serif; }
+    .host { max-width: 1100px; margin: 0 auto 20px; }
+    .host h1 { margin: 0 0 4px; font-size: 28px; }
+    .host p { margin: 0 0 12px; }
+    .host nav { display: flex; flex-wrap: wrap; gap: 8px; }
+    .host button { padding: 6px 14px; border: 2px solid #222; border-radius: 999px; background: #fff; font: inherit; cursor: pointer; }
+    #frame { height: 680px; max-width: 1100px; margin: 0 auto; border-radius: 14px; overflow: hidden; box-shadow: 0 18px 50px rgba(0, 0, 0, .18); }
+  </style>
+</head>
+<body>
+  <header class="host">
+    <h1>Host page</h1>
+    <p>The frame below is the real Switchyard interface on synthetic demo data, running without a server.</p>
+    <nav aria-label="Playground view">
+      <button type="button" data-view="archive">archive</button>
+      <button type="button" data-view="schedules">schedules</button>
+      <button type="button" data-view="live">live</button>
+      <button type="button" data-view="handoff">handoff</button>
+    </nav>
+  </header>
+  <div id="frame"></div>
+  <script type="module">
+    import { mount } from './dist/switchyard-playground.js';
+    const frame = document.getElementById('frame');
+    const params = new URLSearchParams(location.search);
+    if (params.get('width')) frame.style.width = `${Number(params.get('width'))}px`;
+    if (params.get('height')) frame.style.height = `${Number(params.get('height'))}px`;
+    let handle = mount(frame, { view: params.get('view') || undefined, locale: params.get('locale') || undefined });
+    for (const button of document.querySelectorAll('[data-view]')) {
+      button.addEventListener('click', () => {
+        handle.unmount();
+        handle = window.SwitchyardPlayground.mount(frame, { view: button.dataset.view });
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "@switchyard/playground",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Huseyin Kaplan",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "vite --open /dev.html",
+    "build": "vite build",
+    "snapshot": "node scripts/snapshot.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "postcss": "^8.5.31",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "8.3.4"
+  }
+}

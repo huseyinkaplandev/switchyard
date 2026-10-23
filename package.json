@@ -7,7 +7,8 @@
   "author": "Huseyin Kaplan",
   "workspaces": [
     "ui",
-    "cli"
+    "cli",
+    "playground"
   ],
   "engines": {
     "node": ">=22.13"
@@ -16,10 +17,13 @@
     "dev": "npm run dev -w @switchyard/ui",
     "build": "npm run build -w @switchyard/ui && npm run build -w @switchyard/cli",
     "start": "npm run start -w @switchyard/ui",
-    "typecheck": "npm run typecheck -w @switchyard/ui && npm run typecheck -w @switchyard/cli",
+    "typecheck": "npm run typecheck -w @switchyard/ui && npm run typecheck -w @switchyard/cli && npm run typecheck -w @switchyard/playground",
     "test": "npm test -w @switchyard/ui",
     "demo": "node scripts/demo.mjs",
     "demo:live": "node scripts/demo-live.mjs",
+    "playground:dev": "npm run dev -w @switchyard/playground",
+    "playground:build": "npm run build -w @switchyard/playground",
+    "playground:snapshot": "npm run snapshot -w @switchyard/playground",
     "sync:agents": "npm run sync -w @switchyard/cli"
   }
 }
