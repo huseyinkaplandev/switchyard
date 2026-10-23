@@ -68,7 +68,7 @@ export function Shell({ initialView, initialLocale }: { initialView: PlaygroundV
                 <nav aria-label={t.workspaceNavigation} className="workspace-navigation">
                   <div role="tablist" aria-orientation="vertical">
                     {items.map(({ id, label, icon: Icon }) => (
-                      <button key={id} type="button" role="tab" aria-selected={view === id} aria-current={view === id ? 'page' : undefined}
+                      <button key={id} type="button" role="tab" data-tour={`nav:${id}`} aria-selected={view === id} aria-current={view === id ? 'page' : undefined}
                         aria-label={label} title={label} className="workspace-nav-item" onClick={() => setView(id)}>
                         <Icon size={18} aria-hidden="true" /><span>{label}</span>
                       </button>

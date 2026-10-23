@@ -203,7 +203,7 @@ export default function SchedulesPanel({ locale }: { locale: Locale }) {
         <DataTable caption={sourceName === 'claude' ? 'Claude Code' : sourceName} locale={locale} rowKey="key" emptyMessage={t.workspaceNoMatches}
           columns={[{key:'name',label:tr?'Görev':'Task',priority:'primary'},{key:'state',label:t.workspaceStatus,format:{kind:'badge',tones:{[t.workspaceActive]:'success',[t.workspacePaused]:'neutral'}}},{key:'schedule',label:tr?'Takvim':'Schedule'},{key:'lastRun',label:tr?'Son koşu':'Last run'},{key:'account',label:tr?'Hesap':'Account',priority:'secondary'},{key:'actions',label:tr?'İşlem':'Action',sortable:false}]}
           rows={items.map(task=>({key:`${task.source}:${task.account}:${task.id}`,name:task.name,state:task.enabled?t.workspaceActive:t.workspacePaused,schedule:task.schedule||'—',lastRun:task.lastRunAt?dateTime(task.lastRunAt):'—',account:accountLabel(task.account)}))}
-          renderCell={(row,column)=>column.key==='actions'?<button type="button" aria-expanded={inspected===row.key} onClick={()=>setInspected(inspected===row.key?'':String(row.key))}>{t.auiDetails}</button>:undefined}/>
+          renderCell={(row,column)=>column.key==='actions'?<button type="button" data-tour={`schedule-details:${row.key}`} aria-expanded={inspected===row.key} onClick={()=>setInspected(inspected===row.key?'':String(row.key))}>{t.auiDetails}</button>:undefined}/>
         {items.filter(task=>`${task.source}:${task.account}:${task.id}`===inspected).map(task => <details open key={`${task.source}:${task.account}:${task.id}`} className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-4 py-3">
           <summary className="cursor-pointer text-sm flex items-center justify-between gap-2">
             <span>{task.name} <span className="text-zinc-600 text-[10px] ml-1">{task.account === 'local' ? '' : accountLabel(task.account)}</span></span>
@@ -219,7 +219,7 @@ export default function SchedulesPanel({ locale }: { locale: Locale }) {
               <ul className="space-y-1">{task.runs.map(run => <li key={run.desktopId} className="rounded border border-zinc-800 px-3 py-2">
                 <a className="text-cyan-300 hover:underline" href={`/?tab=codex&provider=claude-code&session=${encodeURIComponent(run.nativeId)}`}>{dateTime(run.at)}</a>
                 <span className="text-zinc-500"> · {accountLabel(run.account)}</span>
-                <p className={run.outcome ? 'text-zinc-400 mt-1' : 'text-amber-400 mt-1'}>{run.outcome ? run.outcome : (tr ? 'Arşivde asistan cevabı yok: koşu bir şey yapmamış olabilir.' : 'No assistant reply in the archive: this run may have done nothing.')}</p>
+                <p data-tour={run.outcome ? undefined : 'schedule-run-empty'} className={run.outcome ? 'text-zinc-400 mt-1' : 'text-amber-400 mt-1'}>{run.outcome ? run.outcome : (tr ? 'Arşivde asistan cevabı yok: koşu bir şey yapmamış olabilir.' : 'No assistant reply in the archive: this run may have done nothing.')}</p>
               </li>)}</ul>
             </div>}
             {task.source === 'claude' && task.account === data.activeClaudeAccount && task.platform === localPlatform && <button type="button" disabled={busy || !task.schedule} onClick={() => copyToCodex(task)} className="px-3 py-2 rounded border border-cyan-800 hover:bg-cyan-950 disabled:opacity-40">{tr ? 'Codex’e kopyala' : 'Copy to Codex'}</button>}

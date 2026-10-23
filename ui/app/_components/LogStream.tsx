@@ -86,7 +86,7 @@ export default function LogStream({ entries, locale }: LogStreamProps) {
               };
 
               return (
-                <div key={idx} className="flex items-start gap-1 leading-relaxed break-all select-text font-mono">
+                <div key={idx} data-tour="log-entry" className="flex items-start gap-1 leading-relaxed break-all select-text font-mono">
                   <span className="text-zinc-550 shrink-0">[{formatTime(entry.ts)}]</span>
                   <span className="text-zinc-400 shrink-0">{entry.role}/</span>
                   <span

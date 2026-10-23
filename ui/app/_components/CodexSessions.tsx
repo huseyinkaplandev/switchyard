@@ -696,7 +696,7 @@ export default function CodexSessions({
     <div className="conversation-workspace flex flex-col gap-4" data-mobile-detail={mobileDetail || undefined}>
       <div className="conversation-toolbar">
         <div className="provider-switch" role="group" aria-label="Agent">
-          {(['codex', 'claude-code', 'opencode', 'antigravity'] as const).map(id => <button key={id} type="button" aria-pressed={provider === id} onClick={() => { setProvider(id); setMobileDetail(false); }}>
+          {(['codex', 'claude-code', 'opencode', 'antigravity'] as const).map(id => <button key={id} type="button" data-tour={`provider:${id}`} aria-pressed={provider === id} onClick={() => { setProvider(id); setMobileDetail(false); }}>
             <AgentIcon agent={id} size={18} />{id === 'codex' ? 'Codex' : id === 'claude-code' ? 'Claude Code' : id === 'opencode' ? 'OpenCode' : 'Antigravity'}
           </button>)}
         </div>
@@ -720,6 +720,7 @@ export default function CodexSessions({
             <label className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/70 px-3 py-2.5 focus-within:border-cyan-800">
               <Search size={14} className="shrink-0 text-zinc-600" />
               <input
+                data-tour="archive-search"
                 aria-label={t.workspaceSearch}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
@@ -778,7 +779,7 @@ export default function CodexSessions({
           <div className="conversation-list-scroll custom-scrollbar">
             <section className="aui-recents" aria-label={t.auiRecents}>
               <div className="aui-list-section-heading"><h4>{t.auiRecents}</h4><details><summary aria-label={t.auiRecentSearch}><Search size={13}/></summary><input aria-label={t.auiRecentSearch} placeholder={t.auiRecentSearch} value={recentQuery} onChange={event=>setRecentQuery(event.target.value)}/></details></div>
-              {recents.slice(0,recentExpanded?30:8).map(thread=>{const at=activity[thread.id]?.activityAt || thread.updatedAt;const recent=recentActivity(at,activityNow);return <button type="button" key={thread.id} className="aui-recent-row" aria-pressed={selectedId===thread.id} onClick={()=>{fromRecent.current=true;selectThread(thread);setMobileDetail(true);}} title={`${displayTitle(thread)} · ${formatDate(at,locale)}`}><span>{displayTitle(thread)}</span>{recent?<time dateTime={at}>{recent.minutes===0?t.activityJustNow:t.activityMinutesAgo(recent.minutes)}</time>:<AgentIcon agent={provider} size={13}/>}</button>})}
+              {recents.slice(0,recentExpanded?30:8).map(thread=>{const at=activity[thread.id]?.activityAt || thread.updatedAt;const recent=recentActivity(at,activityNow);return <button type="button" key={thread.id} data-tour={`recent:${thread.id}`} className="aui-recent-row" aria-pressed={selectedId===thread.id} onClick={()=>{fromRecent.current=true;selectThread(thread);setMobileDetail(true);}} title={`${displayTitle(thread)} · ${formatDate(at,locale)}`}><span>{displayTitle(thread)}</span>{recent?<time dateTime={at}>{recent.minutes===0?t.activityJustNow:t.activityMinutesAgo(recent.minutes)}</time>:<AgentIcon agent={provider} size={13}/>}</button>})}
               {recents.length===0&&(!catalogRequired||catalogReady)&&<p className="aui-muted">{t.workspaceNoMatches}</p>}
               {recents.length>8&&<button type="button" className="aui-show-more" onClick={()=>setRecentExpanded(value=>!value)}>{recentExpanded?t.auiShowLess:t.auiShowMore}</button>}
             </section>

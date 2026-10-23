@@ -29,8 +29,34 @@
   .workspace-navigation::-webkit-scrollbar { display: none; }
   .workspace-navigation [role=tablist] { flex-direction: row; gap: 4px; }
   .workspace-nav-item { width: auto; flex-shrink: 0; }
-  .sy-handoff { height: calc(100vh - 170px); border-radius: 12px; }
+  /* Filters, list and footer do not fit one narrow screen either: the panel grows and the frame scrolls. */
+  .sy-handoff { height: auto; min-height: 0; border-radius: 12px; }
+  .sy-handoff .desktop-handoff-panel { height: auto; }
+  .sy-handoff .handoff-selection-layout { flex: none; }
+  .sy-handoff :is(.handoff-candidates, .handoff-delivery) { flex: none; overflow: visible; }
   /* A small frame cannot hold toolbar, list and transcript at once: let them stack and the frame scroll. */
   .conversation-workspace { height: auto; min-height: 0; }
   .conversation-workspace[data-mobile-detail] .conversation-reader[data-selected] { height: calc(100vh - 24px); min-height: 480px; }
+}
+
+/* Guided tour overlay (src/tour/tour.ts). It never takes pointer input. */
+.sy-tour { position: absolute; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif); }
+.sy-tour-cursor { position: absolute; left: 0; top: 0; width: 20px; height: 24px; margin: -1px 0 0 -2px; opacity: 0; transition-property: transform, opacity; transition-timing-function: cubic-bezier(.22, .8, .26, 1); filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .45)); }
+.sy-tour-cursor[data-shown] { opacity: 1; }
+.sy-tour-cursor svg { display: block; transition: scale .12s ease-out; transform-origin: 2px 2px; }
+.sy-tour-cursor[data-pressed] svg { scale: .86; }
+.sy-tour-ripple { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.sy-tour-ripple::after { content: ""; position: absolute; left: -18px; top: -18px; width: 36px; height: 36px; border-radius: 999px; border: 2px solid rgba(255, 255, 255, .85); background: rgba(255, 255, 255, .18); animation: sy-tour-ripple .6s ease-out forwards; }
+.sy-tour-ring { position: absolute; border-radius: 12px; border: 2px solid rgba(103, 232, 249, .95); box-shadow: 0 0 0 4px rgba(103, 232, 249, .18), 0 0 24px rgba(103, 232, 249, .25); opacity: 0; transition: opacity .25s ease; }
+.sy-tour-ring[data-shown] { opacity: 1; }
+.sy-tour-caption { position: absolute; left: 16px; right: 16px; bottom: 18px; width: fit-content; max-width: 620px; margin: 0 auto; display: flex; align-items: baseline; gap: 10px; padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(12, 12, 14, .92); color: #f4f4f5; font-size: 13.5px; line-height: 1.45; box-shadow: 0 12px 32px rgba(0, 0, 0, .45); transform: translateY(8px); opacity: 0; transition: opacity .25s ease, transform .25s ease; }
+.sy-tour-caption[data-shown] { opacity: 1; transform: none; }
+.sy-tour-count { flex-shrink: 0; font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; color: #a1a1aa; }
+.sy-tour-count:empty { display: none; }
+.sy-tour[data-still] .sy-tour-cursor, .sy-tour[data-still] .sy-tour-ripple { display: none; }
+.sy-tour[data-still] .sy-tour-caption, .sy-tour[data-still] .sy-tour-ring { transition: none; }
+@keyframes sy-tour-ripple { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .sy-tour-cursor, .sy-tour-ripple { display: none; }
+  .sy-tour-caption, .sy-tour-ring { transition: none; }
 }

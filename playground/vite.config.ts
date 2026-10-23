@@ -22,6 +22,8 @@ const insideUi = (file: string) => slash(file).startsWith(`${slash(uiApp)}/`);
  * - `fetch` and `EventSource` inside ui/app modules are bound to in-memory versions by a per-module
  *   import, and `window.history` writes go to the in-memory router. Nothing global is patched, so
  *   the host page keeps its own fetch, EventSource and URL.
+ * - `el.scrollIntoView(...)` becomes a call to a method keyed by a private symbol, which scrolls only
+ *   the containers inside the playground and never the host page.
  */
 function serverBoundary(): Plugin {
   const actionsModule = slash(path.join(uiApp, '_actions'));
@@ -50,6 +52,10 @@ function serverBoundary(): Plugin {
       if (/\bwindow\.history\./.test(code)) {
         imports.push(`import { playgroundHistory as __playgroundHistory } from ${JSON.stringify(slash(path.join(shims, 'next-navigation.ts')))};`);
         output = output.replace(/\bwindow\.history\./g, '__playgroundHistory.');
+      }
+      if (/\.scrollIntoView\(/.test(code)) {
+        imports.push(`import { scrollIntoViewKey as __playgroundScrollIntoView } from ${JSON.stringify(slash(path.join(shims, 'contained-scroll.ts')))};`);
+        output = output.replace(/\?\.scrollIntoView\(/g, '?.[__playgroundScrollIntoView](').replace(/\.scrollIntoView\(/g, '[__playgroundScrollIntoView](');
       }
       if (!imports.length) return null;
       const directive = /^(['"])use (client|server)\1;?\s*/.exec(output);
