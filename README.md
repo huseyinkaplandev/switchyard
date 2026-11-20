@@ -86,6 +86,26 @@ Optional:
 - **Activity log CLI:** `npm run build` also builds `cli/`. Then `node cli/dist/bin/log-agent.js codex backend "TASK-0005 done"` appends to the activity log, and `.githooks/post-commit` logs commits from a project that sets `git config core.hooksPath <path-to-switchyard>/.githooks`.
 - **Development server:** `npm run dev` (Turbopack, port 3010).
 
+### Chat memory from the command line
+
+The archive is also usable without the UI, by you or by an agent. These scripts have no dependencies and print JSON:
+
+```bash
+node scripts/chat-search.mjs "invoice export" --limit 5        # full-text search over every archived message
+node scripts/chat-graph.mjs build                               # one digest per chat, plus an entity graph
+node scripts/chat-graph.mjs who file:scripts/server.ts --brief  # every chat that touched an entity, one line each
+node scripts/chat-memory.mjs handoff add --title "Finish the export fix" --text "Tests are left" --project api
+node scripts/chat-memory.mjs handoff claim 1 --session <id>     # only one chat can claim a note
+node scripts/chat-memory.mjs brief --cwd .                      # what a new chat in this folder should know
+node scripts/archive-merge.mjs export chats.db                  # on one machine
+node scripts/archive-merge.mjs merge chats.db                   # on the other; local chats are never dropped
+```
+
+- **Graph kinds:** projects and files are found on their own. Put your own kinds in `<data dir>/chat-graph.json`, for example `{ "kinds": { "customer": ["Acme"] }, "patterns": { "ticket": "\\bOPS-\\d+\\b" } }`.
+- **MCP server:** `scripts/chat-mcp.mjs` exposes search, graph, facts, brief and handoff notes as tools over stdio: `claude mcp add chat-memory -- node <path-to-switchyard>/scripts/chat-mcp.mjs`.
+- **Session-start brief:** register `node <path-to-switchyard>/scripts/chat-memory.mjs brief --hook` as a Claude Code `SessionStart` hook to give every new chat the recent chats of its folder, open handoff notes and remembered preferences.
+- **Facts (optional, remote):** `node scripts/chat-memory.mjs extract` turns chats into dated facts with a source message. It is the one command that leaves the machine: it sends a clipped transcript to the Anthropic API and needs `ANTHROPIC_API_KEY`. Repeated preferences become rule proposals (`lessons`), and a rule is written to the rules file only when you `approve` it.
+
 ### Configuration
 
 | Variable | Default | Purpose |
@@ -95,6 +115,8 @@ Optional:
 | `SWITCHYARD_TIMEZONE` | system zone | Zone used for "today" filters |
 | `SWITCHYARD_MAC_HOME` | unset | A read-only copy of a Mac home folder, for example one synced with `scripts/export-mac-data.mjs` |
 | `SWITCHYARD_SKILLS_BUNDLE` | `<data dir>/skills` | Folder that skill sync writes the newest copy of every skill to |
+| `SWITCHYARD_RULES_FILE` | `<data dir>/memory/LEARNED_RULES.md` | File that approved rules are appended to, for example your own `CLAUDE.md` |
+| `SWITCHYARD_MEMORY_MODEL`, `ANTHROPIC_API_KEY` | `claude-haiku-5-5`, unset | Only for `chat-memory.mjs extract` |
 | `CODEX_HOME`, `ANTIGRAVITY_HOME`, `OPENCODE_HOME` | tool defaults | Same meaning as in the tools themselves |
 | `OLLAMA_BASE_URL`, `OLLAMA_MODEL` | `http://127.0.0.1:11434`, `qwen2.5:3b` | Optional local AI helpers |
 | `SWITCHYARD_DEMO`, `SWITCHYARD_DEMO_ROOT` | unset | Set by `npm run demo` |
@@ -165,14 +187,14 @@ flowchart LR
 
 - `ui/`: the Next.js app. Server code is in `ui/app/_lib/`, routes in `ui/app/api/`, workers and their tests in `ui/scripts/`.
 - `cli/`: `log-agent` (append to the activity log) and `switchyard-sync` (trigger an archive sync on an interval).
-- `scripts/`: Claude scheduled-task sync across accounts, skill sync, Mac export, and the demo launcher.
+- `scripts/`: Claude scheduled-task sync across accounts, skill sync, Mac export, the demo launcher, and the chat memory tools (search, graph, facts and handoff notes, MCP server, archive export and merge).
 - `fixtures/demo/`: the generator for the synthetic demo world.
 - `windows/`, `macos/`: start, autostart and watchdog scripts.
 
 ## Privacy
 
 - The server binds to `127.0.0.1` only. Routes that write native files, start processes or build handoff packages reject requests from another origin.
-- There is no telemetry, analytics or remote call. The only network traffic is between your browser and the local server, plus the optional Ollama endpoint you configure.
+- There is no telemetry, analytics or remote call. The only network traffic is between your browser and the local server, plus the optional Ollama endpoint you configure. The one exception is `scripts/chat-memory.mjs extract`, which you run yourself with your own API key and which sends chat text to the Anthropic API; nothing else in the chat memory tools uses the network.
 - Native session files and databases are opened read-only. Images are served from the original file on request and never copied into the database.
 - Handoff text is passed through pattern-based secret redaction (API keys, tokens, private keys, JWTs). This is a heuristic: the native session copies in a snapshot are byte-exact and can contain secrets, so keep snapshot folders local.
 
@@ -207,11 +229,11 @@ Each of these does its own job well; Switchyard overlaps with parts of several o
 ```bash
 npm ci
 npm run typecheck   # tsc --noEmit in ui/ and cli/
-npm test            # node:test suites in ui/scripts (80 tests)
+npm test            # node:test suites in ui/scripts (89 tests)
 npm run build       # Next.js production build and the CLI
 ```
 
-The tests cover the native parsers (Codex rollouts, Claude Code queue records, Antigravity transcripts, OpenCode parts), the conversation list, transcript images, handoff integrity and snapshot hashing, the reply worker and its locking, the Desktop controller with a fake adapter (account checks, uncertain-delivery handling, tampering), the scheduler, Claude schedule migration across accounts, Claude-to-Codex task copies and skill sync. The C# UI Automation helper has its own checks in `ui/scripts/desktop-handoff/windows/Controller.test.ps1`.
+The tests cover the native parsers (Codex rollouts, Claude Code queue records, Antigravity transcripts, OpenCode parts), the conversation list, transcript images, handoff integrity and snapshot hashing, the reply worker and its locking, the Desktop controller with a fake adapter (account checks, uncertain-delivery handling, tampering), the scheduler, Claude schedule migration across accounts, Claude-to-Codex task copies, skill sync, and the chat memory tools on a synthetic archive (search, graph, handoff claims, rule proposals, the MCP server, archive merge). The C# UI Automation helper has its own checks in `ui/scripts/desktop-handoff/windows/Controller.test.ps1`.
 
 ## Roadmap
 
